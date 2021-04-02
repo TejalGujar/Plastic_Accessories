@@ -24,6 +24,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.plasticaccessories.AddProduct;
+import com.example.plasticaccessories.BottomNavigationActivity;
 import com.example.plasticaccessories.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -63,12 +64,12 @@ public class AddProductFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.add_product_frag_layout,container,false);
 
-        edt_ProductName = findViewById(R.id.edtProductName);
-        edt_ProductType = findViewById(R.id.edtProductType);
-        edt_Price = findViewById(R.id.edtPrice);
+        edt_ProductName = container.findViewById(R.id.edtProductName);
+        edt_ProductType = container.findViewById(R.id.edtProductType);
+        edt_Price = container.findViewById(R.id.edtPrice);
 
 
-        btn_add = findViewById(R.id.btnAdd);
+        btn_add = container.findViewById(R.id.btnAdd);
 
         //Initialization
         firestoreDB = FirebaseFirestore.getInstance();
@@ -80,7 +81,7 @@ public class AddProductFragment extends Fragment
                 String  strProductType = edt_ProductType.getText().toString();
                 Float fltPrice = Float.parseFloat(edt_Price.getText().toString());
 
-                AddProduct ad = new AddProduct(strProductName,strProductType,fltPrice);
+                AddProduct ad = new AddProduct();
 
                 //reset values on Edit Text
                 edt_ProductName.setText("");
@@ -91,7 +92,7 @@ public class AddProductFragment extends Fragment
                 edt_ProductName.requestFocus();
 
                 //Insertion
-                firestoreDB.collection("PATIENT_DETAILS").add(pd.toMap()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                firestoreDB.collection("PATIENT_DETAILS").add(ad.toMap()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Toast.makeText(AddProductFragment.this,"Data Added",Toast.LENGTH_LONG).show();
@@ -114,10 +115,10 @@ public class AddProductFragment extends Fragment
         mStorage = FirebaseStorage.getInstance();
         rootReference = mStorage.getReference();
 
-        btn_select = findViewById(R.id.btnSelectImage);
-        btn_upload = findViewById(R.id.btnUploadImage);
+        btn_select = container.findViewById(R.id.btnSelectImage);
+        btn_upload = container.findViewById(R.id.btnUploadImage);
 
-        image_show = findViewById(R.id.imgShow);
+        image_show = container.findViewById(R.id.imgShow);
 
         btn_select.setOnClickListener(new View.OnClickListener() {
             @Override
