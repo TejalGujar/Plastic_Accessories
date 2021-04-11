@@ -20,6 +20,10 @@
         </activity>
         <activity android:name=".BottomNavigationActivity"
             android:theme="@style/Theme.PlasticAccessories">
+
+        </activity>
+        <activity android:name=".GoogleSignInActivity"
+            android:theme="@style/Theme.PlasticAccessories">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

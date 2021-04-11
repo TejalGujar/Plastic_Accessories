@@ -22,20 +22,29 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.plasticaccessories.AddProduct;
+import com.example.plasticaccessories.ProductsDetails;
 import com.example.plasticaccessories.BottomNavigationActivity;
+//import com.example.plasticaccessories.ProductsDetails;
 import com.example.plasticaccessories.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
@@ -63,13 +72,19 @@ public class AddProductFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.add_product_frag_layout,container,false);
+    }
 
-        edt_ProductName = container.findViewById(R.id.edtProductName);
-        edt_ProductType = container.findViewById(R.id.edtProductType);
-        edt_Price = container.findViewById(R.id.edtPrice);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        edt_ProductName = view.findViewById(R.id.edtProductName);
+        edt_ProductType = view.findViewById(R.id.edtProductType);
+        edt_Price = view.findViewById(R.id.edtPrice);
 
 
-        btn_add = container.findViewById(R.id.btnAdd);
+        btn_add = view.findViewById(R.id.btnAdd);
+
 
         //Initialization
         firestoreDB = FirebaseFirestore.getInstance();
@@ -81,7 +96,7 @@ public class AddProductFragment extends Fragment
                 String  strProductType = edt_ProductType.getText().toString();
                 Float fltPrice = Float.parseFloat(edt_Price.getText().toString());
 
-                AddProduct ad = new AddProduct();
+                ProductsDetails ad = new ProductsDetails();
 
                 //reset values on Edit Text
                 edt_ProductName.setText("");
@@ -95,12 +110,12 @@ public class AddProductFragment extends Fragment
                 firestoreDB.collection("PATIENT_DETAILS").add(ad.toMap()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(AddProductFragment.this,"Data Added",Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"Data Added",Toast.LENGTH_LONG).show();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(AddProductFragment.this,"Fail...",Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"Fail...",Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -113,12 +128,15 @@ public class AddProductFragment extends Fragment
 
         //storage initialization
         mStorage = FirebaseStorage.getInstance();
+
+
+
         rootReference = mStorage.getReference();
 
-        btn_select = container.findViewById(R.id.btnSelectImage);
-        btn_upload = container.findViewById(R.id.btnUploadImage);
+        btn_select = view.findViewById(R.id.btnSelectImage);
+        btn_upload = view.findViewById(R.id.btnUploadImage);
 
-        image_show = container.findViewById(R.id.imgShow);
+        image_show = view.findViewById(R.id.imgShow);
 
         btn_select.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,11 +151,7 @@ public class AddProductFragment extends Fragment
                 uploadImage();
             }
         });
-    }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     private void selectImage(){
