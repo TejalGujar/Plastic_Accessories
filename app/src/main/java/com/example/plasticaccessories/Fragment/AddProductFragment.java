@@ -69,6 +69,7 @@ public class AddProductFragment extends Fragment
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        ctx = context;
     }
 
     @Nullable
@@ -106,6 +107,7 @@ public class AddProductFragment extends Fragment
                 ProductsDetails ad = new ProductsDetails(strProductName,strProductType,fltPrice);
 
                 //reset values on Edit Text
+                image_show.setImageBitmap(null);
                 edt_ProductName.setText("");
                 edt_ProductType.setText("");
                 edt_Price.setText("");
@@ -185,9 +187,8 @@ public class AddProductFragment extends Fragment
                     @Override
                     public void onSuccess(Uri uri) {
 
-                        String get_url;
-                        get_url = String.valueOf(Log.d("DOWNLOAD URL : ",uri.toString()));
-                        firestoreDB.collection(get_url).get();
+                        //String.valueOf(Log.d("DOWNLOAD URL : ",uri.toString()));
+                        String img_url = uri.toString();
                     }
                 });
 

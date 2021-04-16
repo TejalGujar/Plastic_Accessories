@@ -12,19 +12,13 @@ public class ProductsDetails implements Serializable {
     Float productPrice;
 
     //constructor
-    public ProductsDetails(String productId, String productName,String productType, Float productPrice){
-        this.productId = productId;
+    public ProductsDetails(String productName, String productType, Float productPrice) {
         this.productName = productName;
         this.productType = productType;
         this.productPrice = productPrice;
     }
 
-    public ProductsDetails(String strProductName, String strProductType, Float fltPrice) {
-    }
-
     //getter and setter
-
-
     public String getProductId() {
         return productId;
     }

@@ -35,12 +35,13 @@ public class AllProductsFragment extends Fragment
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        ctx = context;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.all_products_frag_layout,container,false);
+        return inflater.inflate(R.layout.all_products_list_layout,container,false);
     }
 
     @Override
