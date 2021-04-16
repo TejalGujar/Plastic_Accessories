@@ -1,6 +1,7 @@
 package com.example.plasticaccessories.Fragment;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -55,7 +56,9 @@ public class AddProductFragment extends Fragment
     Button btn_select, btn_upload,btn_add;
     ImageView image_show;
     EditText edt_ProductName, edt_ProductType, edt_Price;
+    String doc_id;
     private Uri filePath;
+    Context ctx;
 
     int PICK_IMAGE_REQUEST = 10;
 
@@ -81,13 +84,17 @@ public class AddProductFragment extends Fragment
         edt_ProductName = view.findViewById(R.id.edtProductName);
         edt_ProductType = view.findViewById(R.id.edtProductType);
         edt_Price = view.findViewById(R.id.edtPrice);
-
-
         btn_add = view.findViewById(R.id.btnAdd);
-
+        btn_select = view.findViewById(R.id.btnSelectImage);
+        image_show = view.findViewById(R.id.imgShow);
 
         //Initialization
         firestoreDB = FirebaseFirestore.getInstance();
+
+        //storage initialization
+        mStorage = FirebaseStorage.getInstance();
+
+        rootReference = mStorage.getReference();
 
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,7 +103,7 @@ public class AddProductFragment extends Fragment
                 String  strProductType = edt_ProductType.getText().toString();
                 Float fltPrice = Float.parseFloat(edt_Price.getText().toString());
 
-                ProductsDetails ad = new ProductsDetails();
+                ProductsDetails ad = new ProductsDetails(strProductName,strProductType,fltPrice);
 
                 //reset values on Edit Text
                 edt_ProductName.setText("");
@@ -107,36 +114,22 @@ public class AddProductFragment extends Fragment
                 edt_ProductName.requestFocus();
 
                 //Insertion
-                firestoreDB.collection("PATIENT_DETAILS").add(ad.toMap()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                firestoreDB.collection("PRODUCT_DETAILS").add(ad.toMap()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(this,"Data Added",Toast.LENGTH_LONG).show();
+                        Toast.makeText(ctx,"Data Added",Toast.LENGTH_LONG).show();
+                        doc_id = documentReference.getId();
+                        uploadImage();
+
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(this,"Fail...",Toast.LENGTH_LONG).show();
+                        Toast.makeText(ctx,"Fail...",Toast.LENGTH_LONG).show();
                     }
                 });
             }
         });
-
-        //get runtime permission from user
-        ActivityCompat.requestPermissions(this,new String[]{
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-
-        //storage initialization
-        mStorage = FirebaseStorage.getInstance();
-
-
-
-        rootReference = mStorage.getReference();
-
-        btn_select = view.findViewById(R.id.btnSelectImage);
-        btn_upload = view.findViewById(R.id.btnUploadImage);
-
-        image_show = view.findViewById(R.id.imgShow);
 
         btn_select.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,14 +137,26 @@ public class AddProductFragment extends Fragment
                 selectImage();
             }
         });
+    }
 
-        btn_upload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uploadImage();
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+        super.onActivityResult(requestCode,resultCode,data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null)
+        {
+            //get the Uri of data
+            filePath = data.getData();
+            try {
+                //setting image on image view using Bitmap
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(ctx.getContentResolver(),filePath);
+                image_show.setImageBitmap(bitmap);
             }
-        });
-
+            catch (IOException e){
+                //log the exception
+                e.printStackTrace();
+            }
+        }
     }
 
     private void selectImage(){
@@ -163,7 +168,7 @@ public class AddProductFragment extends Fragment
 
     private void uploadImage()
     {
-        ProgressDialog progressDialog = new ProgressDialog(this);
+        ProgressDialog progressDialog = new ProgressDialog(ctx);
         progressDialog.setTitle("Uploading...");
         progressDialog.setCancelable(false);
         progressDialog.show();
@@ -179,17 +184,20 @@ public class AddProductFragment extends Fragment
                 fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        Log.d("DOWNLOAD URL",uri.toString());
+
+                        String get_url;
+                        get_url = String.valueOf(Log.d("DOWNLOAD URL : ",uri.toString()));
+                        firestoreDB.collection(get_url).get();
                     }
                 });
 
-                Toast.makeText(AddProductFragment.this,"Upload Successfully...",Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx,"Upload Successfully...",Toast.LENGTH_LONG).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 progressDialog.dismiss();
-                Toast.makeText(AddProductFragment.this,"Uploading Fail...",Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx,"Uploading Fail...",Toast.LENGTH_LONG).show();
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -198,25 +206,5 @@ public class AddProductFragment extends Fragment
                 progressDialog.setMessage("Uploaded" + " " +(int)progress + "%");
             }
         });
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
-    {
-        super.onActivityResult(requestCode,resultCode,data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null)
-        {
-            //get the Uri of data
-            filePath = data.getData();
-            try {
-                //setting image on image view using Bitmap
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
-                image_show.setImageBitmap(bitmap);
-            }
-            catch (IOException e){
-                //log the exception
-                e.printStackTrace();
-            }
-        }
     }
 }

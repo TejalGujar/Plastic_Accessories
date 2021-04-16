@@ -30,6 +30,7 @@ import java.util.List;
 public class AllProductsFragment extends Fragment
 {
     FirebaseFirestore firestoreDB;
+    Context ctx;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -46,7 +47,10 @@ public class AllProductsFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView rvpList = findViewById(R.id.rvpList);
+        RecyclerView rvpList = view.findViewById(R.id.rvpList);
+
+        //initialization
+        firestoreDB = FirebaseFirestore.getInstance();
 
         firestoreDB.collection("PRODUCT_DETAILS").orderBy("pName", Query.Direction.ASCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -56,21 +60,20 @@ public class AllProductsFragment extends Fragment
 
                     for (DocumentSnapshot doc:task.getResult()){
                         ProductsDetails pDetails = doc.toObject(ProductsDetails.class);
-                        pDetails.setpId(doc.getId());
+                        pDetails.setProductId(doc.getId());
                         pd.add(pDetails);
                     }
 
-                    rvpList.setLayoutManager(new LinearLayoutManager(AllProductsFragment.this,LinearLayoutManager.VERTICAL,false));
-                    rvpList.setAdapter(new ProductDetailsAdapter(pd,AllProductsFragment.this));
+                    rvpList.setLayoutManager(new LinearLayoutManager(ctx,LinearLayoutManager.VERTICAL,false));
+                    rvpList.setAdapter(new ProductDetailsAdapter(pd,ctx));
 
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(AllProductsFragment.this,"Data Show Fail...",Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx,"Data Show Fail...",Toast.LENGTH_LONG).show();
             }
         });
     }
-
 }

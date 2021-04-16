@@ -26,6 +26,7 @@ public class ProductDetailsAdapter extends RecyclerView.Adapter<ProductDetailsAd
 
     FirebaseFirestore firestoreDB;
 
+    //constructor
     public ProductDetailsAdapter(List<ProductsDetails> pList, Context ctx){
         this.pList = pList;
         this.ctx = ctx;
@@ -35,68 +36,32 @@ public class ProductDetailsAdapter extends RecyclerView.Adapter<ProductDetailsAd
     @NonNull
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int position) {
-        return new ItemViewHolder(LayoutInflater.from(ctx).inflate(R.layout.product_item_layout,parent,false));
+        return new ItemViewHolder(LayoutInflater.from(ctx).inflate(R.layout.all_products_frag_layout,parent,false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         ProductsDetails pd = pList.get(position);
 
-        holder.txtFirstName.setText(pd.getpName());
-        holder.txtLastName.setText(pd.getpType());
-        holder.txtGender.setText(String.valueOf(pd.getpPrice()));
+        holder.txtpName.setText(pd.getProductName());
+        holder.txtpPrice.setText(String.valueOf(pd.getProductPrice()));
 
-
-//        holder.txtFirstName.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(ctx,UpdatePatientActivity.class);
-//                i.putExtra("pd",pd);
-//                ctx.startActivity(i);
-//            }
-//        });
-
-        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                firestoreDB.collection("PATIENT_DETAILS").document(pd.getpId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(ctx,"Data Successfully Deleted",Toast.LENGTH_LONG).show();
-
-                        pList.remove(position);
-
-                        //refresh the adapter
-                        notifyDataSetChanged();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ctx,"Data Deletion Fail",Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        });
     }
 
+    //return number of card items in recycler view
     @Override
     public int getItemCount() {
         return pList.size();
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder{
-        TextView txtFirstName, txtLastName, txtGender, txtSymptoms;
-        Button btnDelete;
+        TextView txtpName, txtpPrice;
 
         public ItemViewHolder(@NonNull View itemView){
             super(itemView);
 
-            this.txtFirstName = itemView.findViewById(R.id.txtpName);
-            this.txtLastName = itemView.findViewById(R.id.txtpType);
-            this.txtGender = itemView.findViewById(R.id.txtpPrice);
-
-//            this.btnDelete = itemView.findViewById(R.id.btnDelete);
+            this.txtpName = itemView.findViewById(R.id.txtProductName);
+            this.txtpPrice = itemView.findViewById(R.id.txtProductPrice);
         }
     }
-
 }

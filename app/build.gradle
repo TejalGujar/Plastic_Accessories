@@ -49,4 +49,7 @@ dependencies {
 
     // Also declare the dependency for the Google Play services library and specify its version
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
+
+    //for card view layout
+    implementation "androidx.cardview:cardview:1.0.0"
 }

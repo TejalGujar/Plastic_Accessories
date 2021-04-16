@@ -6,44 +6,62 @@ import java.util.Map;
 
 public class ProductsDetails implements Serializable {
 
-    String pId;
-    String pName;
-    String pType;
-    Float pPrice;
+    String productId;
+    String productName;
+    String productType;
+    Float productPrice;
 
-    public ProductsDetails() {
+    //constructor
+    public ProductsDetails(String productId, String productName,String productType, Float productPrice){
+        this.productId = productId;
+        this.productName = productName;
+        this.productType = productType;
+        this.productPrice = productPrice;
     }
 
-    public String getpId() {
-        return pId;
+    public ProductsDetails(String strProductName, String strProductType, Float fltPrice) {
     }
 
-    public void setpId(String pId) {
-        this.pId = pId;
+    //getter and setter
+
+
+    public String getProductId() {
+        return productId;
     }
 
-    public String getpName() {
-        return pName;
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
-//    public void setpName(String pId) {
-//        this.pName = pName;
-//    }
-
-    public String getpType() {
-        return pType;
+    public String getProductName() {
+        return productName;
     }
 
-    public Float getpPrice() {
-        return pPrice;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
+
+    public Float getProductPrice() {
+        return productPrice;
+    }
+
+    public void setProductPrice(Float productPrice) {
+        this.productPrice = productPrice;
+    }
 
     public Map<String, Object> toMap() {
         Map<String, Object> mMap = new HashMap<>();
-        mMap.put("productName", this.pName);
-        mMap.put("productType", this.pType);
-        mMap.put("productPrice", this.pPrice);
+        mMap.put("productName", this.productName);
+        mMap.put("productType", this.productType);
+        mMap.put("productPrice", this.productPrice);
         mMap.put("pImage"," ");
 
         return mMap;
